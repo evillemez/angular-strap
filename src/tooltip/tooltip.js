@@ -206,36 +206,43 @@ angular.module('mgcrea.ngStrap.tooltip', ['mgcrea.ngStrap.core', 'mgcrea.ngStrap
 
           $tooltip.$isShown = scope.$isShown = true;
           safeDigest(scope);
+          
+          // Copied from drew-r:
+          // https://github.com/drew-r/angular-strap/commit/07a57497c588b550d960a64f9fd92714d4c00c79
+          // 
+          // Timeout applies position after content has been properly parsed, fixing positioning
+          // with manual trigger
+          $window.setTimeout(function() {
+            // Now, apply placement
+            $tooltip.$applyPlacement();
 
-          // Now, apply placement
-          $tooltip.$applyPlacement();
-
-          // Once placed, animate it.
-          // Support v1.2+ $animate
-          // https://github.com/angular/angular.js/issues/11713
-          if(angular.version.minor <= 2) {
-            $animate.enter(tipElement, parent, after, enterAnimateCallback);
-          } else {
-            $animate.enter(tipElement, parent, after).then(enterAnimateCallback);
-          }
-          safeDigest(scope);
-
-          $$rAF(function () {
-            // Once the tooltip is placed and the animation starts, make the tooltip visible
-            if(tipElement) tipElement.css({visibility: 'visible'});
-          });
-
-          // Bind events
-          if(options.keyboard) {
-            if(options.trigger !== 'focus') {
-              $tooltip.focus();
+            // Once placed, animate it.
+            // Support v1.2+ $animate
+            // https://github.com/angular/angular.js/issues/11713
+            if(angular.version.minor <= 2) {
+              $animate.enter(tipElement, parent, after, enterAnimateCallback);
+            } else {
+              $animate.enter(tipElement, parent, after).then(enterAnimateCallback);
             }
-            bindKeyboardEvents();
-          }
+            safeDigest(scope);
 
-          if(options.autoClose) {
-            bindAutoCloseEvents();
-          }
+            $$rAF(function () {
+              // Once the tooltip is placed and the animation starts, make the tooltip visible
+              if(tipElement) tipElement.css({visibility: 'visible'});
+            });
+
+            // Bind events
+            if(options.keyboard) {
+              if(options.trigger !== 'focus') {
+                $tooltip.focus();
+              }
+              bindKeyboardEvents();
+            }
+
+            if(options.autoClose) {
+              bindAutoCloseEvents();
+            }
+          }, 0);
 
         };
 

@@ -3603,26 +3603,28 @@
           $tooltip.$isShown = scope.$isShown = true;
           safeDigest(scope);
           $tooltip.$applyPlacement();
-          if (angular.version.minor <= 2) {
-            $animate.enter(tipElement, parent, after, enterAnimateCallback);
-          } else {
-            $animate.enter(tipElement, parent, after).then(enterAnimateCallback);
-          }
-          safeDigest(scope);
-          $$rAF(function() {
-            if (tipElement) tipElement.css({
-              visibility: 'visible'
-            });
-          });
-          if (options.keyboard) {
-            if (options.trigger !== 'focus') {
-              $tooltip.focus();
+          $window.setTimeout(function() {
+            if (angular.version.minor <= 2) {
+              $animate.enter(tipElement, parent, after, enterAnimateCallback);
+            } else {
+              $animate.enter(tipElement, parent, after).then(enterAnimateCallback);
             }
-            bindKeyboardEvents();
-          }
-          if (options.autoClose) {
-            bindAutoCloseEvents();
-          }
+            safeDigest(scope);
+            $$rAF(function() {
+              if (tipElement) tipElement.css({
+                visibility: 'visible'
+              });
+            });
+            if (options.keyboard) {
+              if (options.trigger !== 'focus') {
+                $tooltip.focus();
+              }
+              bindKeyboardEvents();
+            }
+            if (options.autoClose) {
+              bindAutoCloseEvents();
+            }
+          }, 0);
         };
         function enterAnimateCallback() {
           scope.$emit(options.prefixEvent + '.show', $tooltip);
